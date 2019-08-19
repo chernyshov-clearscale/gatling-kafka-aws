@@ -44,7 +44,8 @@ fi
 rm -rf target/gatling/*
 
 # Running performance test
-mvn gatling:test -o
+#mvn gatling:test -Dgatling.simulationClass=nl.codecontrol.gatling.simulations.BasicSimulation
+mvn gatling:test -Dgatling.simulationClass=nl.codecontrol.gatling.simulations.KafkaSimulation
 
 #Upload reports
 for _dir in target/gatling/*/
