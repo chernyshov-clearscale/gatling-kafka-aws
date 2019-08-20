@@ -11,13 +11,16 @@ import com.github.mnogu.gatling.kafka.Predef._
 class KafkaSimulation extends Simulation {
   val kafkaConf: KafkaProtocol = kafka
     // Kafka topic name
-    .topic("test")
+    .topic("test1")
     // Kafka producer configs
     .properties(
     Map(
+      "security.protocol"->"SSL",
+      "ssl.truststore.location"->"/tmp/kafka.client.truststore.jks",
+//      "ssl.keystore.location"->"/tmp/kafka.client.truststore.jks",
       ProducerConfig.ACKS_CONFIG -> "1",
       // list of Kafka broker hostname and port pairs
-      ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> "b-1.awskafkatutorialcluste.2py1tn.c3.kafka.us-east-2.amazonaws.com:9094",
+      ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> "b-1.awskafkatutorialcluste.bampes.c3.kafka.us-east-2.amazonaws.com:9094,b-3.awskafkatutorialcluste.bampes.c3.kafka.us-east-2.amazonaws.com:9094,b-2.awskafkatutorialcluste.bampes.c3.kafka.us-east-2.amazonaws.com:9094",
 
       // in most cases, StringSerializer or ByteArraySerializer
       ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG ->
@@ -33,6 +36,6 @@ class KafkaSimulation extends Simulation {
 
   setUp(
     scn
-      .inject(constantUsersPerSec(10) during(10 seconds)))
+      .inject(constantUsersPerSec(200) during(5 seconds)))
     .protocols(kafkaConf)
 }
