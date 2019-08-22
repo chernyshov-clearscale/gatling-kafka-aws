@@ -43,7 +43,6 @@ fi
 ## Clean reports
 rm -rf target/gatling/*
 
-echo 'Updated!!!'
 echo $AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
 CREDS_JSON=`curl 169.254.170.2$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI`
 export AWS_ACCESS_KEY_ID=`echo $CREDS_JSON | jq -r .AccessKeyId`
@@ -54,7 +53,7 @@ echo $AWS_SECRET_ACCESS_KEY
 echo $AWS_SESSION_TOKEN
 
 # Running performance test
-#mvn gatling:test -Dgatling.simulationClass=nl.codecontrol.gatling.simulations.BasicSimulation
+# TODO -D<variable_name> could be used to pass parameters
 mvn gatling:test -Dgatling.simulationClass=nl.codecontrol.gatling.simulations.KafkaSimulation
 
 #Upload reports

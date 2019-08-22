@@ -1,5 +1,6 @@
 version: 1
 task_definition:
+  # Don't forget to grant permissions to the role
   task_role_arn: ecsTaskExecutionRole
   task_execution_role: ecsTaskExecutionRole
   ecs_network_mode: awsvpc
@@ -10,8 +11,9 @@ run_params:
   network_configuration:
     awsvpc_configuration:
       subnets:
-        - "subnet-0f7f94e569f3cf329"
-        - "subnet-0132a63a22228a7ac"
+        - "subnet-052b7425f48210d90"
+        - "subnet-0bfe5677f0addd722"
+        - "subnet-0fbb29888ec9437ad"
       security_groups:
-        - "sg-01914ba8550e15ea9"
+        - "sg-062990eb8d02973ed"
       assign_public_ip: ENABLED

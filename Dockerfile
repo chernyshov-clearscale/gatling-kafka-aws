@@ -1,7 +1,6 @@
 FROM maven:3.6.0-jdk-8-alpine
 
-LABEL maintainer="Richard Hendricksen <richard.hendricksen@codecontrol.nl>"
-
+RUN apk add openjdk8
 RUN apk add jq
 RUN apk add -Uuv python less py-pip openssl tzdata
 RUN pip install awscli
