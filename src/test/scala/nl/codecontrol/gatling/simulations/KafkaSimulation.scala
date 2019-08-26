@@ -19,8 +19,8 @@ class KafkaSimulation extends Simulation {
   val stubData = Array.fill(50000){0.toByte}
   val clock = Clock.systemUTC()
 //  Array(1, 2).groupBy(k => k).map(f => (f._1, 0))
-  var messageCounter: Map[String, Long] = keys.groupBy(k => k).map(f => (f._1, 0L))
-  val mutable = collection.mutable.Map(messageCounter.toSeq: _*)
+//  var messageCounter: Map[String, Long] = keys.groupBy(k => k).map(f => (f._1, 0L))
+  val messageCounter = collection.mutable.Map(keys.groupBy(k => k).map(f => (f._1, 0L)).toSeq: _*)
 
   val kafkaConf: KafkaProtocol = kafka
     // Kafka topic name
@@ -53,7 +53,7 @@ class KafkaSimulation extends Simulation {
   val orderRefs = Iterator.continually({
     // Random number will be accessible in session under variable "OrderRef"
     val key = keys(random.nextInt(keys.length))
-    val counter = mutable(key)
+    val counter = messageCounter(key)
     Map(
       "value" -> {
         val next = Bytes.concat(
@@ -63,7 +63,7 @@ class KafkaSimulation extends Simulation {
           // TODO size of array should be parametrized
           stubData
         ).map(_.toByte)
-        mutable(key) = counter + 1
+        messageCounter(key) = counter + 1
         //        messageCounter+=1
         next
       },
