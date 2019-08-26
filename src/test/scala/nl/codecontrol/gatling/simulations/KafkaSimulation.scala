@@ -1,6 +1,7 @@
 package nl.codecontrol.gatling.simulations
 
 import java.time.Clock
+import java.util.UUID
 
 import com.github.mnogu.gatling.kafka.protocol.KafkaProtocol
 import io.gatling.core.Predef._
@@ -13,16 +14,16 @@ import com.google.common.primitives.{Bytes, Longs}
 class KafkaSimulation extends Simulation {
 
   // Key to distribute messages across partitions
-  val key = System.getProperty("key", "SomeKey")
+  val keys = Array.fill(10){UUID.randomUUID().toString}
   // TODO size of array should be parametrized
-  val stubData = Array[Byte](0,1,2,3)
+  val stubData = Array.fill(50000){0.toByte}
   val clock = Clock.systemUTC()
   var messageCounter: Long = 0L
 
   val kafkaConf: KafkaProtocol = kafka
     // Kafka topic name
     // TODO should be parametrized
-    .topic("test1")
+    .topic("test")
     // Kafka producer configs
     .properties(
     Map(
@@ -46,25 +47,28 @@ class KafkaSimulation extends Simulation {
   // TODO here is the possible way to pass parameters
   println(System.getProperty("environment"))
 
+  val random = scala.util.Random
   val orderRefs = Iterator.continually(
     // Random number will be accessible in session under variable "OrderRef"
-    Map("value" -> {
-      println(clock.instant().toEpochMilli)
-      val next = Bytes.concat(
-        Longs.toByteArray(messageCounter),
-        Longs.toByteArray(clock.instant().toEpochMilli),
-        // payload data
-        // TODO size of array should be parametrized
-        stubData
-      ).map(_.toByte)
-      messageCounter+=1
-      next
-    })
+    Map(
+      "value" -> {
+        val next = Bytes.concat(
+          Longs.toByteArray(messageCounter),
+          Longs.toByteArray(clock.instant().toEpochMilli),
+          // payload data
+          // TODO size of array should be parametrized
+          stubData
+        ).map(_.toByte)
+        messageCounter+=1
+        next
+      },
+      "key" -> keys(random.nextInt(keys.length))
+    )
   )
 
   val scn = scenario("Kafka Test")
     .feed(orderRefs)
-    .exec(kafka("request").send[String, Array[Byte]](key, "${value}"))
+    .exec(kafka("request").send[String, Array[Byte]]("${key}", "${value}"))
 
   // TODO should be parametrized
   setUp(scn.inject(constantUsersPerSec(1) during(10 seconds)))
