@@ -18,7 +18,9 @@ class KafkaSimulation extends Simulation {
   // TODO size of array should be parametrized
   val stubData = Array.fill(50000){0.toByte}
   val clock = Clock.systemUTC()
-  var messageCounter: Long = 0L
+//  Array(1, 2).groupBy(k => k).map(f => (f._1, 0))
+  var messageCounter: Map[String, Long] = keys.groupBy(k => k).map(f => (f._1, 0L))
+  val mutable = collection.mutable.Map(messageCounter.toSeq: _*)
 
   val kafkaConf: KafkaProtocol = kafka
     // Kafka topic name
@@ -48,30 +50,35 @@ class KafkaSimulation extends Simulation {
   println(System.getProperty("environment"))
 
   val random = scala.util.Random
-  val orderRefs = Iterator.continually(
+  val orderRefs = Iterator.continually({
     // Random number will be accessible in session under variable "OrderRef"
+    val key = keys(random.nextInt(keys.length))
+    val counter = mutable(key)
     Map(
       "value" -> {
         val next = Bytes.concat(
-          Longs.toByteArray(messageCounter),
+          Longs.toByteArray(counter),
           Longs.toByteArray(clock.instant().toEpochMilli),
           // payload data
           // TODO size of array should be parametrized
           stubData
         ).map(_.toByte)
-        messageCounter+=1
+        mutable(key) = counter + 1
+        //        messageCounter+=1
         next
       },
-      "key" -> keys(random.nextInt(keys.length))
+      "key" -> {
+        key
+      }
     )
-  )
+  })
 
   val scn = scenario("Kafka Test")
     .feed(orderRefs)
     .exec(kafka("request").send[String, Array[Byte]]("${key}", "${value}"))
 
   // TODO should be parametrized
-  setUp(scn.inject(constantUsersPerSec(1) during(10 seconds)))
+  setUp(scn.inject(constantUsersPerSec(3) during(5 seconds)))
     .protocols(kafkaConf)
 
 }
