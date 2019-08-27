@@ -5,9 +5,12 @@ services:
     image: 848625190772.dkr.ecr.us-east-2.amazonaws.com/distr-docke-flxqu317r5k1:latest
     command: -r org.izolotov.testing
     environment:
-      - GATLING_NR_USERS=1
-      - GATLING_MAX_DURATION=1
-      - GATLING_RAMPUP_TIME=10
+      - KEYS_PER_PRODUCER=10
+      - PAYLOAD_SIZE_BYTES=50000
+      - TOPIC_NAME=topic1
+      - BOOTSTRAP_SERVERS=localhost:9092
+      - MESSAGES_PER_SECOND=50000
+      - DURATION_SECONDS=10
     ulimits:
       nproc: 65535
       nofile:
@@ -19,5 +22,5 @@ services:
         awslogs-create-group: true
         awslogs-group: /ecs/gatling-runner
         # TODO should be parametrized
-        awslogs-region: us-east-2
+        awslogs-region: us-east-1
         awslogs-stream-prefix: gatling-runner
