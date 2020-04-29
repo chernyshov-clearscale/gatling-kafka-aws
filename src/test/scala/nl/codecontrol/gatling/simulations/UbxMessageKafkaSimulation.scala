@@ -14,7 +14,7 @@ import scala.util.Random
 class UbxMessageKafkaSimulation extends Simulation {
 
   // Key to distribute messages across partitions
-  val key = System.getProperty("key", "SomeKey")
+  val key = System.getProperty("key", "PerfTest")
   // TODO size of array should be parametrized
   val clock = Clock.systemUTC()
   var messageCounter: Long = 0L
@@ -22,7 +22,7 @@ class UbxMessageKafkaSimulation extends Simulation {
   val kafkaConf: KafkaProtocol = kafka
     // Kafka topic name
     // TODO should be parametrized
-    .topic("test1")
+    .topic("ubx.qa1.wmiedp")
     // Kafka producer configs
     .properties(
       Map(
@@ -35,7 +35,7 @@ class UbxMessageKafkaSimulation extends Simulation {
 
         ProducerConfig.ACKS_CONFIG -> "1",
         // TODO should be parametrized
-        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> "localhost:9092",
+        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> "b-2.journey-dev-msk.xkesoi.c4.kafka.us-east-1.amazonaws.com:9092,b-3.journey-dev-msk.xkesoi.c4.kafka.us-east-1.amazonaws.com:9092,b-1.journey-dev-msk.xkesoi.c4.kafka.us-east-1.amazonaws.com:9092",
 
         // in most cases, StringSerializer or ByteArraySerializer
         ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG ->
@@ -53,12 +53,13 @@ class UbxMessageKafkaSimulation extends Simulation {
       val x1Id = UUID.randomUUID().toString
       val low = 99990
       val high = 99999
+      val accountId = Random.nextInt(high - low) + low
       val ubxRequest =
         s"""
            |{
            |    "headers": [{
            |            "name": "account_id",
-           |            "value": "${Random.nextInt(high - low) + low}"
+           |            "value": "${accountId}"
            |        }, {
            |            "name": "source_endpoint_id",
            |            "value": "${Random.nextInt(high - low) + low}"
@@ -183,8 +184,8 @@ class UbxMessageKafkaSimulation extends Simulation {
            |    ]
            |}
            |""".stripMargin
-      println(x1Id)
-      //println(ubxRequest)
+      println(s"x1Id: ${x1Id}, accountId: ${accountId}")
+//      println(ubxRequest)
       ubxRequest
     })
   )
