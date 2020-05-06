@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+  namespace: ja-perf-test
+  labels:
+    app: producer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: producer
+  template:
+    metadata:
+      labels:
+        app: producer
+    spec:
+      containers:
+        - name: producer
+          image: "artifactory.acoustic.co/journey-analytics-docker-virtual/staging/ja-kafka-load-test-producer:1.0.6"
+          args: ["300", "10", "perf.test"]
+          imagePullPolicy: "Always"
+      imagePullSecrets:
+        - name: artifactory
