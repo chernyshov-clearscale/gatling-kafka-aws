@@ -19,11 +19,14 @@ class UbxMessageKafkaSimulation extends Simulation {
   val clock = Clock.systemUTC()
   var messageCounter: Long = 0L
 
+  val topic = System.getProperty("topic")
+  println("topic: "+topic)
+
   val kafkaConf: KafkaProtocol = kafka
     // Kafka topic name
     // TODO should be parametrized
 //    .topic("ubx.qa1.wmiedp") //dev
-    .topic("ubx.staging.edp") //staging
+    .topic(topic) //staging
     // Kafka producer configs
     .properties(
       Map(
@@ -47,8 +50,7 @@ class UbxMessageKafkaSimulation extends Simulation {
         ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG ->
           "org.apache.kafka.common.serialization.StringSerializer"))
 
-  // TODO here is the possible way to pass parameters
-  println(System.getProperty("environment"))
+
 
 
   val ubxMessages = Iterator.continually(
@@ -67,12 +69,17 @@ class UbxMessageKafkaSimulation extends Simulation {
     })
   )
 
+  val rate = System.getProperty("rate").toInt
+  val period = System.getProperty("period").toInt
+  println("rate: "+rate)
+  println("period: "+period)
+
   val scn = scenario("Kafka Test")
     .feed(ubxMessages)
     .exec(kafka("request").send[String, String](key, "${value}"))
 
   // TODO should be parametrized
-  setUp(scn.inject(constantUsersPerSec(1) during(1 seconds)))
+  setUp(scn.inject(constantUsersPerSec(rate) during(period seconds)))
     .protocols(kafkaConf)
 
 }
