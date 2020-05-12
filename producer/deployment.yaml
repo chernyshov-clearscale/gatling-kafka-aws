@@ -18,7 +18,7 @@ spec:
       containers:
         - name: producer
           image: "artifactory.acoustic.co/journey-analytics-docker-virtual/staging/ja-kafka-load-test-producer:1.0.6"
-          args: ["300", "10", "perf.test"]
+          args: ["300", "10", "perf.test", "b-1.exchange-staging-msk.wp2b5u.c7.kafka.us-east-1.amazonaws.com:9092,b-3.exchange-staging-msk.wp2b5u.c7.kafka.us-east-1.amazonaws.com:9092,b-2.exchange-staging-msk.wp2b5u.c7.kafka.us-east-1.amazonaws.com:9092"]
           imagePullPolicy: "Always"
       imagePullSecrets:
         - name: artifactory

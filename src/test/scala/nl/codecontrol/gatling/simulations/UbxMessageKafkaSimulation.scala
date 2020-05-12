@@ -22,10 +22,11 @@ class UbxMessageKafkaSimulation extends Simulation {
   val topic = System.getProperty("topic")
   println("topic: "+topic)
 
+  val bootstrapServers = System.getProperty("bootstrap.servers")
+  println("bootstrap.servers: "+bootstrapServers)
+
   val kafkaConf: KafkaProtocol = kafka
     // Kafka topic name
-    // TODO should be parametrized
-//    .topic("ubx.qa1.wmiedp") //dev
     .topic(topic) //staging
     // Kafka producer configs
     .properties(
@@ -38,11 +39,7 @@ class UbxMessageKafkaSimulation extends Simulation {
         */
 
         ProducerConfig.ACKS_CONFIG -> "1",
-        // TODO should be parametrized
-        //dev
-//        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> "b-2.journey-dev-msk.xkesoi.c4.kafka.us-east-1.amazonaws.com:9092,b-3.journey-dev-msk.xkesoi.c4.kafka.us-east-1.amazonaws.com:9092,b-1.journey-dev-msk.xkesoi.c4.kafka.us-east-1.amazonaws.com:9092",
-        //staging
-        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> "b-1.exchange-staging-msk.wp2b5u.c7.kafka.us-east-1.amazonaws.com:9092,b-3.exchange-staging-msk.wp2b5u.c7.kafka.us-east-1.amazonaws.com:9092,b-2.exchange-staging-msk.wp2b5u.c7.kafka.us-east-1.amazonaws.com:9092",
+        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG -> bootstrapServers,
 
         // in most cases, StringSerializer or ByteArraySerializer
         ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG ->
@@ -78,7 +75,6 @@ class UbxMessageKafkaSimulation extends Simulation {
     .feed(ubxMessages)
     .exec(kafka("request").send[String, String](key, "${value}"))
 
-  // TODO should be parametrized
   setUp(scn.inject(constantUsersPerSec(rate) during(period seconds)))
     .protocols(kafkaConf)
 

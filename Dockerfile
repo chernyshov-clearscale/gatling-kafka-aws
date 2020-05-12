@@ -4,7 +4,6 @@ RUN apk add openjdk8
 RUN apk add jq
 RUN apk add -Uuv python less py-pip openssl tzdata
 RUN pip install awscli
-#RUN cp /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
 
 RUN apk --purge -v del py-pip && \
     rm /var/cache/apk/*
